@@ -6,6 +6,8 @@ import PDFViewerWrapper from './components/PDFViewerWrapper';
 interface PdfItem {
   id: string;
   title: string;
+  subject?: string;
+  keywords?: string;
   filename?: string;
   sizeBytes?: number;
   pageCount: number;
@@ -35,7 +37,7 @@ export default function Home() {
 
   // Metadata State
   const [metadata, setMetadata] = useState<MetadataState>({
-    title: 'Merged Document',
+    title: 'Assembled Structural Report',
     author: 'FLYXTO PDF Suite',
     subject: 'PDF Outline & TOC',
     producer: '@cantoo/pdf-lib',
@@ -53,7 +55,7 @@ export default function Home() {
 
   // Auto recalculate TOC entries when PDF list or order changes
   function updateTocSuggestions(items: PdfItem[]) {
-    let cumulativePage = 1;
+    let cumulativePage = 2; // Front matter = 1 ToC page (Page 1)
     const suggested: TocItem[] = items.map((pdf, idx) => {
       const entry = {
         id: String(idx + 1),
@@ -179,7 +181,7 @@ export default function Home() {
     }
   }
 
-  const totalInputPages = pdfItems.reduce((sum, item) => sum + item.pageCount, 0);
+  const totalInputPages = (pdfItems.length > 0 ? 1 : 0) + pdfItems.reduce((sum, item) => sum + item.pageCount, 0);
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans p-4 sm:p-8">

@@ -29,6 +29,9 @@ export async function POST(req: Request) {
       let pageCount = 0;
       let title = file.name.replace(/\.pdf$/i, '');
 
+      let subject = '';
+      let keywords = '';
+
       try {
         const pdfDoc = await PDFDocument.load(pdfBuffer, { ignoreEncryption: true });
         pageCount = pdfDoc.getPageCount();
@@ -36,8 +39,10 @@ export async function POST(req: Request) {
         if (pdfTitle && pdfTitle.trim().length > 0) {
           title = pdfTitle.trim();
         }
+        subject = pdfDoc.getSubject() || '';
+        keywords = pdfDoc.getKeywords() || '';
       } catch (err: any) {
-        console.warn(`Failed to parse page count for file ${file.name}:`, err);
+        console.warn(`Failed to parse metadata for file ${file.name}:`, err);
         pageCount = 1; // Fallback
       }
 
@@ -46,6 +51,8 @@ export async function POST(req: Request) {
       parsedPdfs.push({
         id: `upload-${Date.now()}-${i}`,
         title,
+        subject,
+        keywords,
         filename: file.name,
         sizeBytes: file.size,
         pageCount,
